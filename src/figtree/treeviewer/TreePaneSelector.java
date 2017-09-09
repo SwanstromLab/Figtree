@@ -28,6 +28,11 @@ import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Set;
+import javax.swing.*;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.RootedTreeUtils;
+import jebl.util.NumberFormatter;
+
 
 /**
  * @author Andrew Rambaut
@@ -122,6 +127,12 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             return;
         }
 
+        if (mouseEvent.getClickCount() == 2) {
+            RootedTree tree = treePane.getTree();
+            Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
+            JOptionPane.showMessageDialog(null, getNodeText(tree, node));
+        }
+
         if (toolMode == ToolMode.ROOTING) {
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
             if (node != null) {
@@ -169,6 +180,21 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 
             treePane.setCrosshairShown(isCrossHairShown);
         }
+    }
+
+    private String getNodeText(RootedTree tree, Node node) {
+        NumberFormatter formatter = new NumberFormatter(4);
+        StringBuilder sb = new StringBuilder();
+        if (!tree.isExternal(node)) {
+            int n = RootedTreeUtils.getTipCount(tree, node);
+            sb.append(tree.isRoot(node) ? "Tree: " : "Subtree: ").append(n).append(" tips");
+        } else {
+            sb.append("Tip: \"").append(tree.getTaxon(node).toString()).append("\"");
+        }
+        sb.append(" [height = ").append(formatter.getFormattedValue(tree.getHeight(node)));
+        sb.append(", length = ").append(formatter.getFormattedValue(tree.getLength(node)));
+        sb.append("]");
+        return sb.toString();
     }
 
     public void mousePressed(MouseEvent mouseEvent) {
