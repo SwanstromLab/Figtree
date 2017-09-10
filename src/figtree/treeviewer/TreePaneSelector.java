@@ -20,6 +20,7 @@
 
 package figtree.treeviewer;
 
+import figtree.application.FileContents;
 import jebl.evolution.graphs.Node;
 import jam.mac.Utils;
 
@@ -130,7 +131,16 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         if (mouseEvent.getClickCount() == 2) {
             RootedTree tree = treePane.getTree();
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
-            JOptionPane.showMessageDialog(null, getNodeText(tree, node));
+
+            String taxon = new String();
+            taxon = tree.getTaxon(node).toString();
+
+            try {
+				FileContents.displayResults(taxon);
+			} catch (Exception e) {
+				System.out.println("Exception occurred");
+				e.printStackTrace();
+			}
         }
 
         if (toolMode == ToolMode.ROOTING) {

@@ -67,6 +67,7 @@ import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
+import javax.swing.JFileChooser;
 
 /**
  * Primary window for FigTree. The window contains a toolbar, a control panel and a panel displaying the
@@ -211,6 +212,16 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         findToolButton.setFocusable(false);
         toolBar.addComponent(findToolButton);
         findToolButton.setEnabled(true);
+
+        final ToolbarAction uploadToolbarAction = new ToolbarAction("Upload", "Upload file...", findToolIcon) {
+            public void actionPerformed(ActionEvent e){
+                uploadAction.actionPerformed(e);
+            }
+        };
+        JButton uploadToolButton = new ToolbarButton(uploadToolbarAction);
+        uploadToolButton.setFocusable(false);
+        toolBar.addComponent(uploadToolButton);
+        uploadToolButton.setEnabled(true);
 
 //		final ToolbarAction infoToolbarAction = new ToolbarAction("Get Info", "Get Info...", infoToolIcon) {
 //			public void actionPerformed(ActionEvent e){
@@ -1447,6 +1458,10 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         writer.close();
     }
 
+    public final void doUpload() {
+        FileContents.load();
+    }
+
     public final void doFind() {
         if (findPanel == null) {
             findPanel = new FindPanel(findAllAction, null);
@@ -1843,6 +1858,12 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
     private AbstractAction findAction = new AbstractAction("Find...") {
         public void actionPerformed(ActionEvent ae) {
             doFind();
+        }
+    };
+
+    private AbstractAction uploadAction = new AbstractAction("Upload...") {
+        public void actionPerformed(ActionEvent ae) {
+				doUpload();
         }
     };
 
