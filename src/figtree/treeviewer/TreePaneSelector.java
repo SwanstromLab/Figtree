@@ -192,21 +192,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         }
     }
 
-    private String getNodeText(RootedTree tree, Node node) {
-        NumberFormatter formatter = new NumberFormatter(4);
-        StringBuilder sb = new StringBuilder();
-        if (!tree.isExternal(node)) {
-            int n = RootedTreeUtils.getTipCount(tree, node);
-            sb.append(tree.isRoot(node) ? "Tree: " : "Subtree: ").append(n).append(" tips");
-        } else {
-            sb.append("Tip: \"").append(tree.getTaxon(node).toString()).append("\"");
-        }
-        sb.append(" [height = ").append(formatter.getFormattedValue(tree.getHeight(node)));
-        sb.append(", length = ").append(formatter.getFormattedValue(tree.getLength(node)));
-        sb.append("]");
-        return sb.toString();
-    }
-
     public void mousePressed(MouseEvent mouseEvent) {
         treePane.requestFocus();
 

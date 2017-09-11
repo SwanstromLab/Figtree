@@ -1,8 +1,12 @@
 package figtree.application;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+
+import figtree.treeviewer.TabbedPane;
+
 import javax.swing.JScrollPane;
 import java.io.*;
 import java.util.*;
@@ -53,15 +57,34 @@ public class FileContents {
 
     public static void displayResults(String taxon) throws Exception {
         List<String> results = lookUp(taxon);
-        JTextArea textArea = new JTextArea(15, 50);
-        JScrollPane pane = new JScrollPane(textArea);
-
-        textArea.setEditable(false);
+        
+        JTextArea sequenceTextArea = new JTextArea(32, 62);
+        sequenceTextArea.setEditable(false);
+        
+        // sequence view
+        sequenceTextArea.append(">" + taxon + "\n");
 
         for (String result : results) {
-        textArea.append(result + "\n");
+        	sequenceTextArea.append(result + "\n");
         }
+        
+        sequenceTextArea.append("\n\n\n");
+        
+        // alignment view
+        JTextArea alignmentTextArea = new JTextArea(32, 62);
+        alignmentTextArea.setEditable(false);
+        alignmentTextArea.append(">" + taxon + ":");
 
-        JOptionPane.showMessageDialog(null, pane, taxon, JOptionPane.PLAIN_MESSAGE);
+        for (String result : results) {
+        	alignmentTextArea.append(result);
+        }
+        
+        alignmentTextArea.append("\n");
+
+//        JOptionPane.showMessageDialog(null, pane, taxon, JOptionPane.PLAIN_MESSAGE);
+        TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
+		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		tp.setSize(800, 600);
+		tp.setVisible(true);
     }
 }
