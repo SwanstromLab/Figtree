@@ -31,6 +31,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.Set;
 import java.util.ArrayList;
 import javax.swing.*;
+
+import jebl.evolution.taxa.*;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
 import jebl.util.NumberFormatter;
@@ -133,14 +135,13 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         if (mouseEvent.getClickCount() == 2) {
             RootedTree tree = treePane.getTree();
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
-
             Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
             
             if (tips.isEmpty()) {
             	System.out.println("Taxons");
 		        	String taxon = new String();
 		        taxon = tree.getTaxon(node).toString();
-		        
+
 	            try {
 					FileContents.displayResults(taxon);
 				} catch (Exception e) {
@@ -150,22 +151,18 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             } else {
             	System.out.println("tips implementation");
             	ArrayList<String> tipTaxons = new ArrayList<String>();
-            	
+
             	for(Node tip : tips) {
             		tipTaxons.add(tree.getTaxon(tip).toString());
             	}
-            	
+
             		try {
 					FileContents.displayMultipleResults(tipTaxons);
 				} catch (Exception e) {
 					System.out.println("Exception occurred");
 					e.printStackTrace();
 				}
-            	
-            
             }
-                        
-            
         }
 
         if (toolMode == ToolMode.ROOTING) {
@@ -232,7 +229,24 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 
         if (dragMode == DragMode.SELECT) {
             if (treePane.getDragRectangle() != null) {
+            RootedTree tree = treePane.getTree();
                 Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
+                ArrayList<String> tipTaxons = new ArrayList<String>();
+
+                for(Node node : selectedNodes) {
+                    Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
+                    for(Node tip : tips) {
+                        System.out.println(tree.getTaxon(tip).toString());
+                        tipTaxons.add(tree.getTaxon(tip).toString());
+                    }
+                }
+
+                try {
+					FileContents.displayMultipleResults(tipTaxons);
+				} catch (Exception e) {
+					System.out.println("Exception occurred");
+					e.printStackTrace();
+				}
 
                 boolean extendSelection = mouseEvent.isShiftDown();
                 boolean invertSelection = isCommandKeyDown(mouseEvent);
@@ -267,6 +281,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
                 }
             }
         }
+
         treePane.setDragRectangle(null);
     }
 
