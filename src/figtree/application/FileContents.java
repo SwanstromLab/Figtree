@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import figtree.treeviewer.TabbedPane;
+import jebl.evolution.graphs.Node;
 
 import javax.swing.JScrollPane;
 import java.io.*;
@@ -41,7 +42,7 @@ public class FileContents {
         BufferedReader br = new BufferedReader(fr);
         String node;
         String keyword = ">" + taxon;
-        List values = new ArrayList();
+        List<String> values = new ArrayList<String>();
 
         while ((node=br.readLine())!=null) {
           if(node.contains(keyword)) {
@@ -54,34 +55,82 @@ public class FileContents {
         }
         return values;
     }
+    
+    
+    
+    public static JTextArea generateTextArea(String taxon, List<String> results, String delimiter) {
+	    	JTextArea textArea = new JTextArea(32, 62);
+	    	textArea.setEditable(false);
+	    	
+	    	String taxonName = ">" + taxon + delimiter;
+	    	
+	    	textArea.append(taxonName);
+	
+	    for (String result : results) {
+		    	if(delimiter == "\n") {
+		    		textArea.append(result + "\n");
+		    	} else {
+		    		textArea.append(result);
+		    	}
+	    }
+	    
+	    textArea.append("\n");
+	    	
+	    	return textArea;
+    }
+    
+    public static JTextArea generateMultiTextArea(ArrayList<String> taxons, String delimiter) {
+    	JTextArea textArea = new JTextArea(32, 62);
+    	textArea.setEditable(false);
+    	
+    	for(String taxon : taxons) {
+    		List<String> results = new ArrayList<String>();
+    		try {
+				results = lookUp(taxon);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		String taxonName = ">" + taxon + delimiter;
+	    	
+    		textArea.append(taxonName);
+
+    	    for (String result : results) {
+	    	    	if(delimiter == "\n") {
+	    	    		textArea.append(result + "\n");
+	    	    	} else {
+	    	    		textArea.append(result);
+	    	    	}
+    	    	
+    	    }
+    	    
+    	    textArea.append("\n");
+    	}
+    	
+    	return textArea;
+}
+    
+    public static void displayMultipleResults(ArrayList<String> taxons) throws Exception {
+    		
+        
+        JTextArea sequenceTextArea = generateMultiTextArea(taxons, "\n");
+        
+        JTextArea alignmentTextArea = generateMultiTextArea(taxons, ":");
+
+        TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
+		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		tp.setSize(800, 600);
+		tp.setVisible(true);
+    }
+    
 
     public static void displayResults(String taxon) throws Exception {
         List<String> results = lookUp(taxon);
         
-        JTextArea sequenceTextArea = new JTextArea(32, 62);
-        sequenceTextArea.setEditable(false);
+        JTextArea sequenceTextArea = generateTextArea(taxon, results, "\n");
         
-        // sequence view
-        sequenceTextArea.append(">" + taxon + "\n");
+        JTextArea alignmentTextArea = generateTextArea(taxon, results, ":");
 
-        for (String result : results) {
-        	sequenceTextArea.append(result + "\n");
-        }
-        
-        sequenceTextArea.append("\n\n\n");
-        
-        // alignment view
-        JTextArea alignmentTextArea = new JTextArea(32, 62);
-        alignmentTextArea.setEditable(false);
-        alignmentTextArea.append(">" + taxon + ":");
-
-        for (String result : results) {
-        	alignmentTextArea.append(result);
-        }
-        
-        alignmentTextArea.append("\n");
-
-//        JOptionPane.showMessageDialog(null, pane, taxon, JOptionPane.PLAIN_MESSAGE);
         TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
 		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		tp.setSize(800, 600);
