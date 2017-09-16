@@ -216,16 +216,6 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         toolBar.addComponent(findToolButton);
         findToolButton.setEnabled(true);
 
-        final ToolbarAction uploadToolbarAction = new ToolbarAction("Upload", "Upload file...", findToolIcon) {
-            public void actionPerformed(ActionEvent e){
-                uploadAction.actionPerformed(e);
-            }
-        };
-        JButton uploadToolButton = new ToolbarButton(uploadToolbarAction);
-        uploadToolButton.setFocusable(false);
-        toolBar.addComponent(uploadToolButton);
-        uploadToolButton.setEnabled(true);
-
 //		final ToolbarAction infoToolbarAction = new ToolbarAction("Get Info", "Get Info...", infoToolIcon) {
 //			public void actionPerformed(ActionEvent e){
 //				getInfoAction.actionPerformed(e);
@@ -297,6 +287,18 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         box1.add(toggle3);
         toolBar.addComponent(new GenericToolbarItem("Selection Mode", "What aspect of the tree is selected when it is clicked", box1));
 
+        toolBar.addFlexibleSpace();
+        
+        final ToolbarAction uploadToolbarAction = new ToolbarAction("Upload", "Upload file...", uploadToolIcon) {
+            public void actionPerformed(ActionEvent e){
+                uploadAction.actionPerformed(e);
+            }
+        };
+        JButton uploadToolButton = new ToolbarButton(uploadToolbarAction);
+        uploadToolButton.setFocusable(false);
+        toolBar.addComponent(uploadToolButton);
+        uploadToolButton.setEnabled(true);
+        
         toolBar.addFlexibleSpace();
 
         final ToolbarAction prevTreeToolbarAction =
