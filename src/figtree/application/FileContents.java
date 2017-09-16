@@ -132,9 +132,17 @@ public class FileContents {
 
     public static JScrollPane generateAlignmentTextPane( ArrayList<String> taxons ) throws Exception {
 
-		int maxKeyLength = Collections.max(taxons, Comparator.comparing(s -> s.length())).length();
-
-		String html = "<style>\n" + 
+		int maxKeyLength = 0;
+		
+		for(String taxon : taxons) {
+			if( taxon.length() > maxKeyLength ) {
+				maxKeyLength = taxon.length();
+			}
+		}
+		
+		StringBuilder html = new StringBuilder();
+		
+		html.append("<style>\n" + 
 				"  div { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
 				" .taxon {width: "+ maxKeyLength +"ch; margin-right: 3ch; }" +
 				"  span:not(.taxon) { background-color: white; width: 2ch; }" + 
@@ -144,11 +152,11 @@ public class FileContents {
 				" .green { background-color: green; }" + 
 				" .cyan { background-color: cyan; }" + 
 				" .black { background-color: black; }" + 
-				"	</style>";
+				"	</style>");
 
 	    	for(String taxon : taxons) {
 	    		
-	    		html += "<div><span class='taxon'>" + taxon + "</span>";
+	    		html.append("<div><span class='taxon'>" + taxon + "</span>");
 	    		
 	    		List<String> results = new ArrayList<String>();
             try {
@@ -165,18 +173,18 @@ public class FileContents {
             }
 	    		
 	    		for( char nucleotide : value.toCharArray() ){
-	    			html += generateNucleotideColorHTML(nucleotide);
+	    			html.append( generateNucleotideColorHTML(nucleotide) );
 	    		}
 	    		
-	    		html += "<br>";
+	    		html.append( "<br>" );
 	    	}
-			
-		html += "</div>";
+
+		html.append( "</div>" );
 			
 		JEditorPane tp = new JEditorPane();
 		tp.setEditable(false);
 		tp.setContentType("text/html");
-	    	tp.setText(html);
+	    	tp.setText(html.toString());
 	
 	    	JScrollPane sp = new JScrollPane(tp);
 	
@@ -233,7 +241,8 @@ public class FileContents {
     }
 
     public static final void initiateLookup(RootedTree tree, Node node) {
-	Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
+	
+    		Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
 
 		if (tips.isEmpty()) {
 			System.out.println("Taxons");
