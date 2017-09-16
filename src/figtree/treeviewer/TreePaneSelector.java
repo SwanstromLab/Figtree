@@ -132,7 +132,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             return;
         }
 
-        FileContents.setSelectedTree(treePane.getTree());
+
 
         if (toolMode == ToolMode.ROOTING) {
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
@@ -148,7 +148,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             treePane.setCrosshairShown(false);
 
             Node selectedNode = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
-            FileContents.setSelectedNode(selectedNode);
 
             boolean extendSelection = mouseEvent.isShiftDown();
             boolean invertSelection = isCommandKeyDown(mouseEvent);
@@ -179,7 +178,8 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
                 default:
                     throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
             }
-
+            FileContents.setSelectedTree(treePane.getTree());
+            FileContents.setSelectedNode(selectedNode);
             treePane.setCrosshairShown(isCrossHairShown);
         }
     }

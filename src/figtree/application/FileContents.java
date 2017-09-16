@@ -91,15 +91,6 @@ public class FileContents {
         }
         return values;
     }
-
-    private static JTextArea generateTextArea(String taxon, List<String> results, String delimiter) {
-	    	JTextArea textArea = new JTextArea(32, 62);
-	    	textArea.setEditable(false);
-	    	
-	    textArea = formatTextArea(textArea, results, taxon, delimiter);
-
-	    	return textArea;
-    }
     
     private static JTextArea formatTextArea(JTextArea textArea, List<String> results, String taxon, String delimiter) {
     String taxonName = ">" + taxon + delimiter;
@@ -117,7 +108,7 @@ public class FileContents {
 	    return textArea;
     }
     
-    public static JTextArea generateMultiTextArea(ArrayList<String> taxons, String delimiter) {
+    public static JTextArea generateTextArea(ArrayList<String> taxons, String delimiter) {
 	    JTextArea textArea = new JTextArea(32, 62);
 	    textArea.setEditable(false);
 
@@ -136,23 +127,10 @@ public class FileContents {
         return textArea;
 	}
 
-    public static void displayMultipleResults(ArrayList<String> taxons) throws Exception {
-        JTextArea sequenceTextArea = generateMultiTextArea(taxons, "\n");
+    public static void displayResults(ArrayList<String> taxons) throws Exception {
+        JTextArea sequenceTextArea = generateTextArea(taxons, "\n");
         
-        JTextArea alignmentTextArea = generateMultiTextArea(taxons, ":");
-
-        TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
-		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		tp.setSize(800, 600);
-		tp.setVisible(true);
-    }
-
-    public static void displayResults(String taxon) throws Exception {
-        List<String> results = lookUp(taxon);
-        
-        JTextArea sequenceTextArea = generateTextArea(taxon, results, "\n");
-        
-        JTextArea alignmentTextArea = generateTextArea(taxon, results, ":");
+        JTextArea alignmentTextArea = generateTextArea(taxons, ":");
 
         TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
 		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -167,9 +145,11 @@ public class FileContents {
 			System.out.println("Taxons");
 				String taxon = new String();
 			taxon = tree.getTaxon(node).toString();
+			ArrayList<String> tipTaxons = new ArrayList<String>();
+			tipTaxons.add(taxon);
 
 			try {
-				displayResults(taxon);
+				displayResults(tipTaxons);
 			} catch (Exception e) {
 				System.out.println("Could not display results for selected node");
 				e.printStackTrace();
@@ -185,7 +165,7 @@ public class FileContents {
 			}
 
 				try {
-				displayMultipleResults(tipTaxons);
+				displayResults(tipTaxons);
 			} catch (Exception e) {
 				System.out.println("Could not display results for selected nodes");
 				e.printStackTrace();
@@ -216,7 +196,7 @@ public class FileContents {
         }
 
         try {
-			displayMultipleResults(tipTaxons);
+			displayResults(tipTaxons);
 		} catch (Exception e) {
 			System.out.println("Could not display results for selected multiple taxons");
 			e.printStackTrace();
