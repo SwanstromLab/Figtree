@@ -55,64 +55,52 @@ public class FileContents {
         }
         return values;
     }
-    
-    
-    
-    public static JTextArea generateTextArea(String taxon, List<String> results, String delimiter) {
+
+    private static JTextArea generateTextArea(String taxon, List<String> results, String delimiter) {
 	    	JTextArea textArea = new JTextArea(32, 62);
 	    	textArea.setEditable(false);
 	    	
-	    	String taxonName = ">" + taxon + delimiter;
-	    	
-	    	textArea.append(taxonName);
-	
-	    for (String result : results) {
-		    	if(delimiter == "\n") {
-		    		textArea.append(result + "\n");
-		    	} else {
-		    		textArea.append(result);
-		    	}
-	    }
-	    
-	    textArea.append("\n");
-	    	
+	    textArea = formatTextArea(textArea, results, taxon, delimiter);
+
 	    	return textArea;
     }
     
-    public static JTextArea generateMultiTextArea(ArrayList<String> taxons, String delimiter) {
-    	JTextArea textArea = new JTextArea(32, 62);
-    	textArea.setEditable(false);
+    private static JTextArea formatTextArea(JTextArea textArea, List<String> results, String taxon, String delimiter) {
+    String taxonName = ">" + taxon + delimiter;
     	
-    	for(String taxon : taxons) {
-    		List<String> results = new ArrayList<String>();
-    		try {
-				results = lookUp(taxon);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		String taxonName = ">" + taxon + delimiter;
-	    	
-    		textArea.append(taxonName);
+		textArea.append(taxonName);
 
-    	    for (String result : results) {
+	    for (String result : results) {
 	    	    	if(delimiter == "\n") {
 	    	    		textArea.append(result + "\n");
 	    	    	} else {
 	    	    		textArea.append(result);
 	    	    	}
-    	    	
-    	    }
-    	    
-    	    textArea.append("\n");
-    	}
-    	
-    	return textArea;
-}
+	    }
+	    textArea.append("\n");
+	    return textArea;
+    }
     
+    public static JTextArea generateMultiTextArea(ArrayList<String> taxons, String delimiter) {
+    JTextArea textArea = new JTextArea(32, 62);
+    textArea.setEditable(false);
+
+        for(String taxon : taxons) {
+            List<String> results = new ArrayList<String>();
+            try {
+                results = lookUp(taxon);
+            } catch (Exception e) {
+                System.out.println("Could not look up taxon in file");
+                e.printStackTrace();
+            }
+
+            textArea = formatTextArea(textArea, results, taxon, delimiter);
+        }
+
+	return textArea;
+	}
+
     public static void displayMultipleResults(ArrayList<String> taxons) throws Exception {
-    		
-        
         JTextArea sequenceTextArea = generateMultiTextArea(taxons, "\n");
         
         JTextArea alignmentTextArea = generateMultiTextArea(taxons, ":");
@@ -122,7 +110,6 @@ public class FileContents {
 		tp.setSize(800, 600);
 		tp.setVisible(true);
     }
-    
 
     public static void displayResults(String taxon) throws Exception {
         List<String> results = lookUp(taxon);

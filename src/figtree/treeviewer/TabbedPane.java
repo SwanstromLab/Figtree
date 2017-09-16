@@ -26,7 +26,7 @@ public class TabbedPane extends JFrame {
 		alignmentTextArea.setEditable(false);
 		JScrollPane alignmentScrollPane = new JScrollPane(alignmentTextArea);
 		alignmentScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		alignmentPanel.add(alignmentScrollPane );
+		alignmentPanel.add(alignmentScrollPane);
 		
 		
 		highlighterPanel.add(highlighterLabel);

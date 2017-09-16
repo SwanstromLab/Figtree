@@ -145,7 +145,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 	            try {
 					FileContents.displayResults(taxon);
 				} catch (Exception e) {
-					System.out.println("Exception occurred");
+					System.out.println("Could not display results for selected node");
 					e.printStackTrace();
 				}
             } else {
@@ -159,7 +159,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             		try {
 					FileContents.displayMultipleResults(tipTaxons);
 				} catch (Exception e) {
-					System.out.println("Exception occurred");
+					System.out.println("Could not display results for selected nodes");
 					e.printStackTrace();
 				}
             }
@@ -232,19 +232,25 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             RootedTree tree = treePane.getTree();
                 Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
                 ArrayList<String> tipTaxons = new ArrayList<String>();
+                Integer count = 0;
 
                 for(Node node : selectedNodes) {
                     Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
+                    if(tips.isEmpty()) {
+                    tips.add(node);
+                    }
                     for(Node tip : tips) {
                         System.out.println(tree.getTaxon(tip).toString());
                         tipTaxons.add(tree.getTaxon(tip).toString());
+                        count++;
                     }
                 }
 
                 try {
 					FileContents.displayMultipleResults(tipTaxons);
+					System.out.println(count);
 				} catch (Exception e) {
-					System.out.println("Exception occurred");
+					System.out.println("Could not display results for selected multiple taxons");
 					e.printStackTrace();
 				}
 
