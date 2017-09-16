@@ -10,8 +10,6 @@ public class TabbedPane extends JFrame {
 	JLabel highlighterLabel = new JLabel("Highlighter View");
 	
 	JTabbedPane tabbedPane = new JTabbedPane();
-	private final JTextArea sequenceTextArea = new JTextArea(32, 62);
-	private final JTextArea alignmentTextArea = new JTextArea(32, 62);
 	
 	public TabbedPane(JTextArea sequenceTextArea, JTextArea alignmentTextArea) {
 		

@@ -216,6 +216,16 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         toolBar.addComponent(findToolButton);
         findToolButton.setEnabled(true);
 
+        final ToolbarAction lookupToolbarAction = new ToolbarAction("Look up", "Look up in file...", findToolIcon) {
+            public void actionPerformed(ActionEvent e){
+                lookupAction.actionPerformed(e);
+            }
+        };
+        JButton lookupToolButton = new ToolbarButton(lookupToolbarAction);
+        lookupToolButton.setFocusable(false);
+        toolBar.addComponent(lookupToolButton);
+        lookupToolButton.setEnabled(true);
+
 //		final ToolbarAction infoToolbarAction = new ToolbarAction("Get Info", "Get Info...", infoToolIcon) {
 //			public void actionPerformed(ActionEvent e){
 //				getInfoAction.actionPerformed(e);
@@ -1467,6 +1477,14 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         FileContents.load();
     }
 
+    public final void doLookup() {
+	    if(FileContents.getSelectedNodes() == null) {
+	        FileContents.initiateLookup(FileContents.getSelectedTree(), FileContents.getSelectedNode());
+	    } else {
+	        FileContents.initiateHighlightedLookup(FileContents.getSelectedTree(), FileContents.getSelectedNodes());
+	    }
+    }
+
     public final void doFind() {
         if (findPanel == null) {
             findPanel = new FindPanel(findAllAction, null);
@@ -1869,6 +1887,12 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
     private AbstractAction uploadAction = new AbstractAction("Upload...") {
         public void actionPerformed(ActionEvent ae) {
 				doUpload();
+        }
+    };
+
+    private AbstractAction lookupAction = new AbstractAction("Look up...") {
+        public void actionPerformed(ActionEvent ae) {
+				doLookup();
         }
     };
 
