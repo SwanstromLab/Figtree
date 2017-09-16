@@ -1,8 +1,10 @@
 package figtree.application;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import figtree.treeviewer.TabbedPane;
@@ -12,6 +14,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
 
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import java.awt.Graphics2D;
 import java.io.*;
@@ -127,15 +130,106 @@ public class FileContents {
         return textArea;
 	}
 
-    public static void displayResults(ArrayList<String> taxons) throws Exception {
-        JTextArea sequenceTextArea = generateTextArea(taxons, "\n");
-        
-        JTextArea alignmentTextArea = generateTextArea(taxons, ":");
+    public static JScrollPane generateAlignmentTextPane( ArrayList<String> taxons ) throws Exception {
 
-        TabbedPane tp = new TabbedPane(sequenceTextArea, alignmentTextArea);
-		tp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		tp.setSize(800, 600);
-		tp.setVisible(true);
+		int maxKeyLength = Collections.max(taxons, Comparator.comparing(s -> s.length())).length();
+
+		String html = "<style>\n" + 
+				"  div { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
+				" .taxon {width: "+ maxKeyLength +"ch; margin-right: 3ch; }" +
+				"  span:not(.taxon) { background-color: white; width: 2ch; }" + 
+				" .red { background-color: red; }" + 
+				" .blue { background-color: blue; }" + 
+				" .yellow { background-color: yellow; }" + 
+				" .green { background-color: green; }" + 
+				" .cyan { background-color: cyan; }" + 
+				" .black { background-color: black; }" + 
+				"	</style>";
+
+	    	for(String taxon : taxons) {
+	    		
+	    		html += "<div><span class='taxon'>" + taxon + "</span>";
+	    		
+	    		List<String> results = new ArrayList<String>();
+            try {
+                results = lookUp(taxon);
+            } catch (Exception e) {
+                System.out.println("Could not look up taxon in file");
+                e.printStackTrace();
+            }
+            
+            String value = "";
+            
+            for(String s : results) {
+            		value += s.replace("\t","");
+            }
+	    		
+	    		for( char nucleotide : value.toCharArray() ){
+	    			html += generateNucleotideColorHTML(nucleotide);
+	    		}
+	    		
+	    		html += "<br>";
+	    	}
+			
+		html += "</div>";
+			
+		JEditorPane tp = new JEditorPane();
+		tp.setEditable(false);
+		tp.setContentType("text/html");
+	    	tp.setText(html);
+	
+	    	JScrollPane sp = new JScrollPane(tp);
+	
+		return sp;
+	} 
+	
+	private static String generateNucleotideColorHTML(char nucleotide) throws Exception {
+			
+		String html = "";
+			
+		switch(nucleotide) {
+			case 'A':
+				html = "<span class='red'>" + String.valueOf(nucleotide) + "</span>";
+				break;
+			case 'T':
+				html = "<span class='blue'>" + String.valueOf(nucleotide) + "</span>";
+				break;
+			case 'C':
+				html = "<span class='yellow'>" + String.valueOf(nucleotide) + "</span>";
+				break;
+			case 'G':
+				html = "<span class='green'>" + String.valueOf(nucleotide) + "</span>";
+				break;
+			case 'U':
+				html = "<span class='cyan'>" + String.valueOf(nucleotide) + "</span>";
+				break;
+			default:
+				html = "<span>" + String.valueOf(nucleotide) + "</span>";
+				break;
+		}
+		
+		return html;
+	}
+    
+    public static void displayResults(ArrayList<String> taxons) throws Exception {
+        
+    		JPanel sequencePane = new JPanel();
+    		JTextArea sequenceTextArea = generateTextArea(taxons, "\n");
+    		sequencePane.add(sequenceTextArea);
+        
+    		JScrollPane alignmentPane = generateAlignmentTextPane(taxons);
+        
+        JTabbedPane tab = new JTabbedPane();
+        tab.addTab("Sequence View", sequencePane);
+        tab.addTab("Alignment View", alignmentPane);
+        tab.addTab("Highlight View", new JScrollPane());
+        
+        JFrame frame = new JFrame("Sequence Key:Value Results");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(tab);
+        frame.setSize(400,400);
+        frame.setVisible(true);
+        
     }
 
     public static final void initiateLookup(RootedTree tree, Node node) {

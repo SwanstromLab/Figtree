@@ -137,7 +137,7 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         Icon nextIcon = IconUtils.getIcon(this.getClass(), "images/next.png");
         Icon prevIcon = IconUtils.getIcon(this.getClass(), "images/prev.png");
 
-        Icon lookupIcon = IconUtils.getIcon(this.getClass(), "images/lookup.png");
+        Icon lookupToolIcon = IconUtils.getIcon(this.getClass(), "images/lookup.png");
         Icon uploadToolIcon = IconUtils.getIcon(this.getClass(), "images/uploadTool.png");
         
         final ToolbarAction cartoonToolbarAction = new ToolbarAction("Cartoon", CARTOON_NODE, cartoonNodeToolIcon) {
@@ -216,16 +216,6 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         toolBar.addComponent(findToolButton);
         findToolButton.setEnabled(true);
 
-        final ToolbarAction lookupToolbarAction = new ToolbarAction("Look up", "Look up in file...", findToolIcon) {
-            public void actionPerformed(ActionEvent e){
-                lookupAction.actionPerformed(e);
-            }
-        };
-        JButton lookupToolButton = new ToolbarButton(lookupToolbarAction);
-        lookupToolButton.setFocusable(false);
-        toolBar.addComponent(lookupToolButton);
-        lookupToolButton.setEnabled(true);
-
 //		final ToolbarAction infoToolbarAction = new ToolbarAction("Get Info", "Get Info...", infoToolIcon) {
 //			public void actionPerformed(ActionEvent e){
 //				getInfoAction.actionPerformed(e);
@@ -299,7 +289,7 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 
         toolBar.addFlexibleSpace();
         
-        final ToolbarAction uploadToolbarAction = new ToolbarAction("Upload", "Upload file...", uploadToolIcon) {
+        final ToolbarAction uploadToolbarAction = new ToolbarAction("Load .fa", "Upload sequence file...", uploadToolIcon) {
             public void actionPerformed(ActionEvent e){
                 uploadAction.actionPerformed(e);
             }
@@ -308,6 +298,16 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         uploadToolButton.setFocusable(false);
         toolBar.addComponent(uploadToolButton);
         uploadToolButton.setEnabled(true);
+        
+        final ToolbarAction lookupToolbarAction = new ToolbarAction("Find values", "Look up in file...", lookupToolIcon) {
+            public void actionPerformed(ActionEvent e){
+                lookupAction.actionPerformed(e);
+            }
+        };
+        JButton lookupToolButton = new ToolbarButton(lookupToolbarAction);
+        lookupToolButton.setFocusable(false);
+        toolBar.addComponent(lookupToolButton);
+        lookupToolButton.setEnabled(true);
         
         toolBar.addFlexibleSpace();
 
