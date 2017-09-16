@@ -137,6 +137,9 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         Icon nextIcon = IconUtils.getIcon(this.getClass(), "images/next.png");
         Icon prevIcon = IconUtils.getIcon(this.getClass(), "images/prev.png");
 
+        Icon lookupIcon = IconUtils.getIcon(this.getClass(), "images/lookup.png");
+        Icon uploadToolIcon = IconUtils.getIcon(this.getClass(), "images/uploadTool.png");
+        
         final ToolbarAction cartoonToolbarAction = new ToolbarAction("Cartoon", CARTOON_NODE, cartoonNodeToolIcon) {
             public void actionPerformed(ActionEvent e){
                 cartoonAction.actionPerformed(e);
