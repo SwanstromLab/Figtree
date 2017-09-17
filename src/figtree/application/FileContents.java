@@ -3,12 +3,9 @@ package figtree.application;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import figtree.treeviewer.TabbedPane;
-import figtree.treeviewer.TreePane;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
@@ -16,7 +13,6 @@ import jebl.evolution.trees.RootedTreeUtils;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import java.awt.Graphics2D;
 import java.io.*;
 import java.util.*;
 
@@ -61,7 +57,6 @@ public class FileContents {
 	public static void setSelectedNodes(Set<Node> nodes) {
 		selectedNodes = nodes;
 	}
-
 
     public static final void load() {
     JFileChooser fileChooser = new JFileChooser();
@@ -111,8 +106,10 @@ public class FileContents {
 	    return textArea;
     }
     
-    public static JTextArea generateTextArea(ArrayList<String> taxons, String delimiter) {
-	    JTextArea textArea = new JTextArea(32, 62);
+    public static JScrollPane generateSequenceView(ArrayList<String> taxons) {
+
+    		JTextArea textArea = new JTextArea(32, 62);
+    		
 	    textArea.setEditable(false);
 
         for(String taxon : taxons) {
@@ -124,13 +121,16 @@ public class FileContents {
                 e.printStackTrace();
             }
 
-            textArea = formatTextArea(textArea, results, taxon, delimiter);
+            textArea = formatTextArea(textArea, results, taxon, "\n");
         }
+        
+        JPanel sequencePane = new JPanel();
+		sequencePane.add(textArea);
 
-        return textArea;
+        return new JScrollPane(sequencePane , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	}
 
-    public static JScrollPane generateAlignmentTextPane( ArrayList<String> taxons ) throws Exception {
+    public static JScrollPane generateAlignmentView( ArrayList<String> taxons ) throws Exception {
 
 		int maxKeyLength = 0;
 		
@@ -185,10 +185,8 @@ public class FileContents {
 		tp.setEditable(false);
 		tp.setContentType("text/html");
 	    	tp.setText(html.toString());
-	
-	    	JScrollPane sp = new JScrollPane(tp);
-	
-		return sp;
+	    	
+		return new JScrollPane(tp , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	} 
 	
 	private static String generateNucleotideColorHTML(char nucleotide) throws Exception {
@@ -221,21 +219,15 @@ public class FileContents {
     
     public static void displayResults(ArrayList<String> taxons) throws Exception {
         
-    		JPanel sequencePane = new JPanel();
-    		JTextArea sequenceTextArea = generateTextArea(taxons, "\n");
-    		sequencePane.add(sequenceTextArea);
-        
-    		JScrollPane alignmentPane = generateAlignmentTextPane(taxons);
-        
         JTabbedPane tab = new JTabbedPane();
-        tab.addTab("Sequence View", sequencePane);
-        tab.addTab("Alignment View", alignmentPane);
+        tab.addTab("Sequence View", generateSequenceView(taxons) );
+        tab.addTab("Alignment View", generateAlignmentView(taxons) );
         tab.addTab("Highlight View", new JScrollPane());
         
         JFrame frame = new JFrame("Sequence Key:Value Results");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(tab);
-        frame.setSize(400,400);
+        frame.setSize(600,600);
         frame.setVisible(true);
         
     }
