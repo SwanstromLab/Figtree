@@ -3,6 +3,7 @@ package figtree.application;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -18,7 +19,7 @@ import java.util.*;
 
 public class FileContents {
 
-	private static File loadedFile;
+	private static File loadedFile = null;
 
 	private static File getLoadedFile() {
 		return loadedFile;
@@ -219,6 +220,11 @@ public class FileContents {
     
     public static void displayResults(ArrayList<String> taxons) throws Exception {
         
+    		if( loadedFile == null ) {
+    			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+    			return;
+    		}
+    	
         JTabbedPane tab = new JTabbedPane();
         tab.addTab("Sequence View", generateSequenceView(taxons) );
         tab.addTab("Alignment View", generateAlignmentView(taxons) );
