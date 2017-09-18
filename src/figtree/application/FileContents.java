@@ -20,6 +20,9 @@ import java.util.*;
 public class FileContents {
 
 	private static File loadedFile = null;
+	private static int maxKeyLength = 0;
+	private static Node selectedNode;
+	private static Set<Node> selectedNodes;
 
 	private static File getLoadedFile() {
 		return loadedFile;
@@ -39,8 +42,6 @@ public class FileContents {
 		selectedTree = tree;
 	}
 
-	private static Node selectedNode;
-
 	public static Node getSelectedNode() {
 		return selectedNode;
 	}
@@ -48,8 +49,6 @@ public class FileContents {
 	public static void setSelectedNode(Node node) {
 		selectedNode = node;
 	}
-
-	private static Set<Node> selectedNodes;
 
 	public static Set<Node> getSelectedNodes() {
 		return selectedNodes;
@@ -60,7 +59,7 @@ public class FileContents {
 	}
 
     public static final void load() {
-    JFileChooser fileChooser = new JFileChooser();
+    		JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         int result = fileChooser.showOpenDialog(null);
         File file = new File("");
@@ -72,158 +71,111 @@ public class FileContents {
         setLoadedFile(file);
     }
 
-    public static List<String> lookUp(String taxon) throws Exception {
-        FileReader fr = new FileReader(getLoadedFile());
-        BufferedReader br = new BufferedReader(fr);
-        String node;
-        String keyword = ">" + taxon;
-        List<String> values = new ArrayList<String>();
-
-        while ((node=br.readLine())!=null) {
-          if(node.contains(keyword)) {
-              String nextLine = br.readLine();
-              while (nextLine!=null && nextLine.startsWith(">") != true) {
-                values.add(nextLine);
-                nextLine = br.readLine();
-              }
-          }
-        }
-        return values;
-    }
-    
-    private static JTextArea formatTextArea(JTextArea textArea, List<String> results, String taxon, String delimiter) {
-    String taxonName = ">" + taxon + delimiter;
+    public static Map<String, String> lookUp(ArrayList<String> taxons) throws Exception {
     	
-		textArea.append(taxonName);
+    		Map<String, String> lookUpMap = new HashMap<String, String>();
 
-	    for (String result : results) {
-	    	    	if(delimiter == "\n") {
-	    	    		textArea.append(result + "\n");
-	    	    	} else {
-	    	    		textArea.append(result);
-	    	    	}
-	    }
-	    textArea.append("\n");
-	    return textArea;
+        BufferedReader br = new BufferedReader( new FileReader(getLoadedFile()) );
+
+        maxKeyLength = 0;
+        
+        for(String taxon : taxons) {
+        	
+        		if( taxon.length() > maxKeyLength ) {
+        			maxKeyLength = taxon.length();
+        		}
+        	    
+        		lookUpMap.put(taxon , "");
+        		
+        		String line;
+        		
+        		while( (line=br.readLine()) != null ){
+        			
+                if( line.startsWith(">") && line.contains(taxon)) {
+                	
+                    String nextLine = br.readLine();
+                    
+                    while (nextLine != null && ! nextLine.startsWith(">") ) {
+                  	  	lookUpMap.put( taxon , lookUpMap.get(taxon) + nextLine );
+                  	  	nextLine = br.readLine();
+                    }
+                    
+                    break;
+                }
+            }
+        }
+
+        br.close(); // https://stackoverflow.com/questions/1388602/do-i-need-to-close-both-filereader-and-bufferedreader
+        
+        return lookUpMap;
     }
     
-    public static JScrollPane generateSequenceView(ArrayList<String> taxons) {
+    public static JScrollPane generateSequenceView(Map<String, String> taxons) {
+    	
+    		StringBuilder text = new StringBuilder();
 
-    		JTextArea textArea = new JTextArea(32, 62);
-    		
+	    taxons.forEach( (taxon, value) -> {
+	    		text.append(">" + taxon + "\n" + value + "\n\n");
+	    });
+	    
+	    JTextArea textArea = new JTextArea(32, 62);
 	    textArea.setEditable(false);
+	    textArea.setLineWrap(true);
+	    textArea.setText( text.toString() );
 
-        for(String taxon : taxons) {
-            List<String> results = new ArrayList<String>();
-            try {
-                results = lookUp(taxon);
-            } catch (Exception e) {
-                System.out.println("Could not look up taxon in file");
-                e.printStackTrace();
-            }
-
-            textArea = formatTextArea(textArea, results, taxon, "\n");
-        }
-        
         JPanel sequencePane = new JPanel();
 		sequencePane.add(textArea);
 
         return new JScrollPane(sequencePane , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	}
 
-    public static JScrollPane generateAlignmentView( ArrayList<String> taxons ) throws Exception {
-
-		int maxKeyLength = 0;
-		
-		for(String taxon : taxons) {
-			if( taxon.length() > maxKeyLength ) {
-				maxKeyLength = taxon.length();
-			}
-		}
+    public static JScrollPane generateAlignmentView(Map<String, String> taxons) throws Exception {
 		
 		StringBuilder html = new StringBuilder();
 		
-		html.append("<style>\n" + 
-				"  div { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
-				" .taxon {width: "+ maxKeyLength +"ch; margin-right: 3ch; }" +
-				"  span:not(.taxon) { background-color: white; width: 2ch; }" + 
-				" .red { background-color: red; }" + 
-				" .blue { background-color: blue; }" + 
-				" .yellow { background-color: yellow; }" + 
-				" .green { background-color: green; }" + 
-				" .cyan { background-color: cyan; }" + 
-				" .black { background-color: black; }" + 
-				"	</style>");
+		html.append(
+			"<style>" + 
+				"#content { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
+				"span { float: right; width: 2ch; }" +
+				".taxon { float: left; margin-right: 3ch; max-width:"+maxKeyLength+"; width:"+maxKeyLength+"ch;}" +
+			"</style>");
+		
+		html.append( "<div id='content'>" );
 
-	    	for(String taxon : taxons) {
-	    		
-	    		html.append("<div><span class='taxon'>" + taxon + "</span>");
-	    		
-	    		List<String> results = new ArrayList<String>();
-            try {
-                results = lookUp(taxon);
-            } catch (Exception e) {
-                System.out.println("Could not look up taxon in file");
-                e.printStackTrace();
-            }
-            
-            String value = "";
-            
-            for(String s : results) {
-            		value += s.replace("\t","");
-            }
+		taxons.forEach( (taxon, value) -> {
+
+			html.append( "<span class='taxon'>" + taxon + "</span>" );
 	    		
 	    		for( char nucleotide : value.toCharArray() ){
-	    			html.append( generateNucleotideColorHTML(nucleotide) );
+	    			
+	    			String colorStyle = 
+	    				nucleotide == 'A' ? "red" :
+	    				nucleotide == 'T' ? "blue" :
+	    				nucleotide == 'C' ? "yellow" :
+	    				nucleotide == 'G' ? "green" :
+	    				nucleotide == 'U' ? "cyan" : 
+	    					"white";
+
+	    			html.append( "<span style='background-color: "+colorStyle+";'>" + String.valueOf(nucleotide) + "</span>" );
 	    		}
 	    		
-	    		html.append( "<br>" );
-	    	}
-
-		html.append( "</div>" );
-			
-		JEditorPane tp = new JEditorPane();
-		tp.setEditable(false);
-		tp.setContentType("text/html");
-	    	tp.setText(html.toString());
-	    	
-		return new JScrollPane(tp , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	} 
-	
-	private static String generateNucleotideColorHTML(char nucleotide) throws Exception {
-			
-		String html = "";
-			
-		switch(nucleotide) {
-			case 'A':
-				html = "<span class='red'>" + String.valueOf(nucleotide) + "</span>";
-				break;
-			case 'T':
-				html = "<span class='blue'>" + String.valueOf(nucleotide) + "</span>";
-				break;
-			case 'C':
-				html = "<span class='yellow'>" + String.valueOf(nucleotide) + "</span>";
-				break;
-			case 'G':
-				html = "<span class='green'>" + String.valueOf(nucleotide) + "</span>";
-				break;
-			case 'U':
-				html = "<span class='cyan'>" + String.valueOf(nucleotide) + "</span>";
-				break;
-			default:
-				html = "<span>" + String.valueOf(nucleotide) + "</span>";
-				break;
-		}
+	    		html.append("<br>");
+	    });
 		
-		return html;
+		html.append( "</div>" );
+		
+		JEditorPane ep = new JEditorPane();
+		ep.setEditable(false);
+		ep.setContentType("text/html");
+		ep.setText(html.toString());
+	    	
+		return new JScrollPane(ep , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
     
-    public static void displayResults(ArrayList<String> taxons) throws Exception {
-        
-    		if( loadedFile == null ) {
-    			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
-    			return;
-    		}
+    
+	public static void displayResults(ArrayList<String> results) throws Exception {
+
+    		Map<String, String> taxons = lookUp( results );
     	
         JTabbedPane tab = new JTabbedPane();
         tab.addTab("Sequence View", generateSequenceView(taxons) );
@@ -238,7 +190,13 @@ public class FileContents {
         
     }
 
-    public static final void initiateLookup(RootedTree tree, Node node) {
+    
+	public static final void initiateLookup(RootedTree tree, Node node) {
+		
+		if( loadedFile == null ) {
+			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+			return;
+		}
 	
     		Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
 
@@ -265,7 +223,7 @@ public class FileContents {
 				tipTaxons.add(tree.getTaxon(tip).toString());
 			}
 
-				try {
+			try {
 				displayResults(tipTaxons);
 			} catch (Exception e) {
 				System.out.println("Could not display results for selected nodes");
@@ -273,8 +231,16 @@ public class FileContents {
 			}
 		}
     }
+    
 
+    
     public static final void initiateHighlightedLookup(RootedTree tree, Set<Node> nodes) {
+    	
+    		if( loadedFile == null ) {
+			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+			return;
+		}
+    	
 		ArrayList<String> tipTaxons = new ArrayList<String>();
 		Integer count = 0;
 		Set<Node> tips = new HashSet<Node>();
