@@ -74,12 +74,18 @@ public class FileContents {
     public static Map<String, String> lookUp(ArrayList<String> taxons) throws Exception {
     	
     		Map<String, String> lookUpMap = new HashMap<String, String>();
+    		
+    		BufferedReader br = new BufferedReader( new FileReader(getLoadedFile()) );
+    		
+    		String[] lines = br.lines().toArray(String[]::new);
 
-        BufferedReader br = new BufferedReader( new FileReader(getLoadedFile()) );
-
+    		br.close();
+    		
         maxKeyLength = 0;
         
         for(String taxon : taxons) {
+        	
+        		System.out.println("taxon: " + taxon);
         	
         		if( taxon.length() > maxKeyLength ) {
         			maxKeyLength = taxon.length();
@@ -87,26 +93,28 @@ public class FileContents {
         	    
         		lookUpMap.put(taxon , "");
         		
-        		String line;
+        		boolean addNode = false;
         		
-        		while( (line=br.readLine()) != null ){
+        		for (String line : lines) {
         			
-                if( line.startsWith(">") && line.contains(taxon)) {
-                	
-                    String nextLine = br.readLine();
-                    
-                    while (nextLine != null && ! nextLine.startsWith(">") ) {
-                  	  	lookUpMap.put( taxon , lookUpMap.get(taxon) + nextLine );
-                  	  	nextLine = br.readLine();
-                    }
-                    
-                    break;
-                }
+        			if( line.startsWith(">") && line.contains(taxon) ){
+                    	
+                		addNode = true;
+                		
+                }else if( addNode ) {
+        				
+        				if( line.startsWith(">") || line.isEmpty() ) {
+        					break;
+        				}
+        				
+        				lookUpMap.put( taxon , lookUpMap.get(taxon) + line.replace("\n", "") );
+        				
+        			}
             }
         }
-
-        br.close(); // https://stackoverflow.com/questions/1388602/do-i-need-to-close-both-filereader-and-bufferedreader
         
+        br.close();
+
         return lookUpMap;
     }
     
@@ -118,7 +126,7 @@ public class FileContents {
 	    		text.append(">" + taxon + "\n" + value + "\n\n");
 	    });
 	    
-	    JTextArea textArea = new JTextArea(32, 62);
+	    JTextArea textArea = new JTextArea(32, 64);
 	    textArea.setEditable(false);
 	    textArea.setLineWrap(true);
 	    textArea.setText( text.toString() );
@@ -185,7 +193,7 @@ public class FileContents {
         JFrame frame = new JFrame("Sequence Key:Value Results");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(tab);
-        frame.setSize(600,600);
+        frame.setSize(1000,1000);
         frame.setVisible(true);
         
     }
