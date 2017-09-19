@@ -85,8 +85,6 @@ public class FileContents {
         
         for(String taxon : taxons) {
         	
-        		System.out.println("taxon: " + taxon);
-        	
         		if( taxon.length() > maxKeyLength ) {
         			maxKeyLength = taxon.length();
         		}
@@ -112,8 +110,6 @@ public class FileContents {
         			}
             }
         }
-        
-        br.close();
 
         return lookUpMap;
     }
@@ -143,13 +139,14 @@ public class FileContents {
 
 		int keyWidth = maxKeyLength + 2;
 		
-		System.out.println( "keyWidth: " + String.valueOf(keyWidth) );
-		
 		html.append(
 			"<style>" + 
 				"#content { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
-				"span { float: right; width: 2ch; }" +
-				".taxon { float: left; margin-right: 3ch; max-width:"+String.valueOf(keyWidth)+"; width:"+maxKeyLength+"ch;}" +
+				".sA {background-color: red; }" +
+				".sT {background-color: blue;}" +
+				".sC {background-color: yellow;}" +
+				".sG {background-color: green;}" +
+				".sU {background-color: cyan;}" +
 			"</style>");
 		
 		html.append( "<div id='content'>" );
@@ -163,25 +160,26 @@ public class FileContents {
 			}
 
 			html.append( "<span class='taxon'>" + taxon + taxonPadding + "</span>" );
+			
+			String chars = "";
 	    		
 	    		for( char nucleotide : value.toCharArray() ){
 	    			
-	    			String colorStyle = 
-	    				nucleotide == 'A' ? "red" :
-	    				nucleotide == 'T' ? "blue" :
-	    				nucleotide == 'C' ? "yellow" :
-	    				nucleotide == 'G' ? "green" :
-	    				nucleotide == 'U' ? "cyan" : 
-	    					"white";
-
-	    			html.append( "<span style='background-color: "+colorStyle+";'>" + String.valueOf(nucleotide) + "</span>" );
+	    			String n = String.valueOf(nucleotide);
+	    			
+	    			if( chars.contains(n) ) {
+	    				chars += n;
+	    			}else {
+	    				html.append( "<span class='s"+n.substring(0,1)+"'>"+n+"</span>" );
+	    				chars = "";
+	    			}
 	    		}
 	    		
 	    		html.append("<br>");
 	    });
 		
 		html.append( "</div>" );
-		
+
 		JEditorPane ep = new JEditorPane();
 		ep.setEditable(false);
 		ep.setContentType("text/html");
@@ -191,12 +189,19 @@ public class FileContents {
 	}
 
 	public static void displayResults(ArrayList<String> results) throws Exception {
+		
+		System.out.println("display");
 
     		Map<String, String> taxons = lookUp( results );
+    		
+    		System.out.println("looked up");
     	
         JTabbedPane tab = new JTabbedPane();
         tab.addTab("Sequence View", generateSequenceView(taxons) );
         tab.addTab("Alignment View", generateAlignmentView(taxons) );
+        
+        System.out.println("views generated");
+        
         tab.addTab("Highlight View", new JScrollPane());
         
         JFrame frame = new JFrame("Sequence Key:Value Results");
@@ -204,6 +209,8 @@ public class FileContents {
         frame.add(tab);
         frame.setSize(1000,1000);
         frame.setVisible(true);
+        
+        System.out.println("framed");
         
     }
 
@@ -281,8 +288,8 @@ public class FileContents {
     }
 
     public static void cleanUp() {
-			setSelectedNode(null);
-			setSelectedNodes(null);
-			setSelectedTree(null);
-		}
+		setSelectedNode(null);
+		setSelectedNodes(null);
+		setSelectedTree(null);
+	}
 }
