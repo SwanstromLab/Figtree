@@ -178,6 +178,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
                 default:
                     throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
             }
+            FileContents.cleanUp();
             FileContents.setSelectedTree(treePane.getTree());
             FileContents.setSelectedNode(selectedNode);
             treePane.setCrosshairShown(isCrossHairShown);
@@ -202,8 +203,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             RootedTree tree = treePane.getTree();
 
             Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
-            FileContents.setSelectedTree(tree);
-            FileContents.setSelectedNodes(selectedNodes);
 
             boolean extendSelection = mouseEvent.isShiftDown();
             boolean invertSelection = isCommandKeyDown(mouseEvent);
@@ -236,6 +235,9 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
                             throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
                     }
                 }
+                FileContents.cleanUp();
+                FileContents.setSelectedTree(tree);
+                FileContents.setSelectedNodes(selectedNodes);
             }
         }
 

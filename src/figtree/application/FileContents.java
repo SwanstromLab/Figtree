@@ -244,37 +244,39 @@ public class FileContents {
     
     public static final void initiateHighlightedLookup(RootedTree tree, Set<Node> nodes) {
     	
-    		if( loadedFile == null ) {
-			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
-			return;
-		}
-    	
-		ArrayList<String> tipTaxons = new ArrayList<String>();
-		Integer count = 0;
-		Set<Node> tips = new HashSet<Node>();
-
-		for(Node node : nodes) {
-			if(tree == null) {
-				tips.add(node);
-			} else {
-				tips = RootedTreeUtils.getDescendantTips(tree, node);
+			if( loadedFile == null ) {
+				JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+				return;
 			}
 
-            if(tips.isEmpty()) {
+			ArrayList<String> tipTaxons = new ArrayList<String>();
+			Integer count = 0;
+			Set<Node> tips = new HashSet<Node>();
 
-            }
-            for(Node tip : tips) {
-                System.out.println(tree.getTaxon(tip).toString());
-                tipTaxons.add(tree.getTaxon(tip).toString());
-                count++;
-            }
-        }
+			for(Node node : nodes) {
+			tips = RootedTreeUtils.getDescendantTips(tree, node);
+
+					if(tips.isEmpty()) {
+							tips.add(node);
+					}
+					for(Node tip : tips) {
+							System.out.println(tree.getTaxon(tip).toString());
+							tipTaxons.add(tree.getTaxon(tip).toString());
+							count++;
+					}
+		  }
 
         try {
-			displayResults(tipTaxons);
-		} catch (Exception e) {
-			System.out.println("Could not display results for selected multiple taxons");
-			e.printStackTrace();
-		}
+					displayResults(tipTaxons);
+				} catch (Exception e) {
+					System.out.println("Could not display results for selected multiple taxons");
+					e.printStackTrace();
+				}
     }
+
+    public static void cleanUp() {
+			setSelectedNode(null);
+			setSelectedNodes(null);
+			setSelectedTree(null);
+		}
 }
