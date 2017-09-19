@@ -140,19 +140,29 @@ public class FileContents {
     public static JScrollPane generateAlignmentView(Map<String, String> taxons) throws Exception {
 		
 		StringBuilder html = new StringBuilder();
+
+		int keyWidth = maxKeyLength + 2;
+		
+		System.out.println( "keyWidth: " + String.valueOf(keyWidth) );
 		
 		html.append(
 			"<style>" + 
 				"#content { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
 				"span { float: right; width: 2ch; }" +
-				".taxon { float: left; margin-right: 3ch; max-width:"+maxKeyLength+"; width:"+maxKeyLength+"ch;}" +
+				".taxon { float: left; margin-right: 3ch; max-width:"+String.valueOf(keyWidth)+"; width:"+maxKeyLength+"ch;}" +
 			"</style>");
 		
 		html.append( "<div id='content'>" );
 
 		taxons.forEach( (taxon, value) -> {
+			
+			String taxonPadding = "";
+			
+			for( int i = 0, j = keyWidth - taxon.length(); i < j; i++ ) {
+				taxonPadding += "&nbsp;";
+			}
 
-			html.append( "<span class='taxon'>" + taxon + "</span>" );
+			html.append( "<span class='taxon'>" + taxon + taxonPadding + "</span>" );
 	    		
 	    		for( char nucleotide : value.toCharArray() ){
 	    			
@@ -179,8 +189,7 @@ public class FileContents {
 	    	
 		return new JScrollPane(ep , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
-    
-    
+
 	public static void displayResults(ArrayList<String> results) throws Exception {
 
     		Map<String, String> taxons = lookUp( results );
@@ -198,7 +207,6 @@ public class FileContents {
         
     }
 
-    
 	public static final void initiateLookup(RootedTree tree, Node node) {
 		
 		if( loadedFile == null ) {
@@ -239,9 +247,7 @@ public class FileContents {
 			}
 		}
     }
-    
 
-    
     public static final void initiateHighlightedLookup(RootedTree tree, Set<Node> nodes) {
     	
 			if( loadedFile == null ) {
