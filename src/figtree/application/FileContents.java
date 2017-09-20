@@ -119,7 +119,7 @@ public class FileContents {
     		StringBuilder text = new StringBuilder();
 
 	    taxons.forEach( (taxon, value) -> {
-	    		text.append(">" + taxon + "\n" + value + "\n\n");
+	    		text.append(">" + taxon + "\n" + value + "\n");
 	    });
 	    
 	    JTextArea textArea = new JTextArea(32, 64);
@@ -141,7 +141,7 @@ public class FileContents {
 		
 		html.append(
 			"<style>" + 
-				"#content { white-space:nowrap; font-size: 16px; font-family: monospace; }" +
+				"#content { white-space:nowrap; font-size: 12px; font-family: monospace; }" +
 				".sA {background-color: red; }" +
 				".sT {background-color: blue;}" +
 				".sC {background-color: yellow;}" +
