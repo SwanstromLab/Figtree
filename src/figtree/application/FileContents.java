@@ -12,8 +12,10 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
 
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import java.awt.BorderLayout;
 import java.io.*;
 import java.util.*;
 
@@ -127,29 +129,29 @@ public class FileContents {
 	    textArea.setLineWrap(true);
 	    textArea.setText( text.toString() );
 
-        JPanel sequencePane = new JPanel();
+        JPanel sequencePane = new JPanel(new BorderLayout());
 		sequencePane.add(textArea);
 
         return new JScrollPane(sequencePane , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	}
 
-    public static JScrollPane generateAlignmentView(Map<String, String> taxons) throws Exception {
+    public static JSplitPane generateAlignmentView(Map<String, String> taxons) throws Exception {
 		
 		StringBuilder html = new StringBuilder();
-
+		StringBuilder taxonHTML = new StringBuilder();
+		StringBuilder valueHTML = new StringBuilder();
+		
 		int keyWidth = maxKeyLength + 2;
 		
 		html.append(
 			"<style>" + 
-				"#content { white-space:nowrap; font-size: 12px; font-family: monospace; }" +
+				"span { white-space:nowrap; font-size: 12px; font-family: monospace; }" +
 				".sA {background-color: red; }" +
 				".sT {background-color: blue;}" +
 				".sC {background-color: yellow;}" +
 				".sG {background-color: green;}" +
 				".sU {background-color: cyan;}" +
 			"</style>");
-		
-		html.append( "<div id='content'>" );
 
 		taxons.forEach( (taxon, value) -> {
 			
@@ -159,7 +161,7 @@ public class FileContents {
 				taxonPadding += "&nbsp;";
 			}
 
-			html.append( "<span class='taxon'>" + taxon + taxonPadding + "</span>" );
+			taxonHTML.append( "<span class='taxon'>" + taxon + taxonPadding + "</span><br>" );
 			
 			String chars = "";
 	    		
@@ -170,23 +172,36 @@ public class FileContents {
 	    			if( chars.contains(n) ) {
 	    				chars += n;
 	    			}else {
-	    				html.append( "<span class='s"+n.substring(0,1)+"'>"+n+"</span>" );
+	    				valueHTML.append( "<span class='s"+n.substring(0,1)+"'>"+n+"</span>" );
 	    				chars = "";
 	    			}
 	    		}
 	    		
-	    		html.append("<br>");
+	    		valueHTML.append("<br>");
 	    });
-		
-		html.append( "</div>" );
 
-		JEditorPane ep = new JEditorPane();
-		ep.setEditable(false);
-		ep.setContentType("text/html");
-		ep.setText(html.toString());
-	    	
-		return new JScrollPane(ep , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	}
+		JEditorPane taxonEP = new JEditorPane();
+		taxonEP.setEditable(false);
+		taxonEP.setContentType("text/html");
+		taxonEP.setText(html.toString() + taxonHTML.toString());
+		
+		JEditorPane valueEP = new JEditorPane();
+		valueEP.setEditable(false);
+		valueEP.setContentType("text/html");
+		valueEP.setText(html.toString() + valueHTML.toString());
+		
+		JScrollPane taxonPane = new JScrollPane(taxonEP , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane valuePane = new JScrollPane(valueEP , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		taxonPane.getVerticalScrollBar().setModel(valuePane.getVerticalScrollBar().getModel());
+		valuePane.getVerticalScrollBar().setModel(taxonPane.getVerticalScrollBar().getModel());
+		
+		JSplitPane panel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT , taxonPane, valuePane);
+		
+		panel.setResizeWeight(0.5f);
+    
+		return panel;
+    }
 
 	public static void displayResults(ArrayList<String> results) throws Exception {
 		
