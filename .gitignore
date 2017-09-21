@@ -7,4 +7,3 @@ out/*
 tests/*
 examples/*
 .DS_Store
-/bin/
