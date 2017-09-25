@@ -19,6 +19,8 @@ import java.awt.BorderLayout;
 import java.io.*;
 import java.util.*;
 
+import figtree.application.FigTreeApplication;
+
 public class FileContents {
 
 	private static File loadedFile = null;
@@ -61,8 +63,7 @@ public class FileContents {
 	}
 
     public static final void load() {
-    		JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+    		JFileChooser fileChooser = new JFileChooser( FigTreeApplication.fileDir );
         int result = fileChooser.showOpenDialog(null);
         File file = new File("");
 

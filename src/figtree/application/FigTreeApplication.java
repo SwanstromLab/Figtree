@@ -80,6 +80,8 @@ public class FigTreeApplication extends MultiDocApplication {
     public static final String DATES = "2006-2017";
 
     public static FigTreeApplication application;
+    
+    public static String fileDir = "";
 
     public FigTreeApplication(MenuBarFactory menuBarFactory, String nameString,  String titleString, String aboutString, Icon icon,
                               String websiteURLString,
@@ -95,6 +97,9 @@ public class FigTreeApplication extends MultiDocApplication {
     public DocumentFrame doOpenFile(File file) {
         DocumentFrame documentFrame = getUpperDocumentFrame();
         if (documentFrame != null && documentFrame.getFile() == null) {
+        	
+        		fileDir = file.getAbsolutePath();
+        	
             documentFrame.openFile(file);
             return documentFrame;
         } else {
