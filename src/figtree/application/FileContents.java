@@ -1,7 +1,6 @@
 package figtree.application;
 
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -16,6 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
 import java.io.*;
 import java.util.*;
 
@@ -63,15 +63,19 @@ public class FileContents {
 	}
 
     public static final void load() {
-    		JFileChooser fileChooser = new JFileChooser( FigTreeApplication.fileDir );
-        int result = fileChooser.showOpenDialog(null);
-        File file = new File("");
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            file = selectedFile;
+    	
+    		FileDialog fd = new FileDialog( new JFrame() , "Open .fa file" , FileDialog.LOAD );
+    		
+        fd.setDirectory(FigTreeApplication.fileDir);
+        
+        fd.setAlwaysOnTop(true);
+        fd.setMultipleMode(false);
+        
+        fd.setVisible(true);
+        
+        if( null != fd.getFile() ) {
+        		setLoadedFile( new File ( fd.getDirectory() + fd.getFile () ) );
         }
-        setLoadedFile(file);
     }
 
     public static Map<String, String> lookUp(ArrayList<String> taxons) throws Exception {
