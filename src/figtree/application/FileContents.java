@@ -82,12 +82,6 @@ public class FileContents {
     	
     		Map<String, String> lookUpMap = new HashMap<String, String>();
     		
-    		BufferedReader br = new BufferedReader( new FileReader(getLoadedFile()) );
-    		
-    		String[] lines = br.lines().toArray(String[]::new);
-
-    		br.close();
-    		
         maxKeyLength = 0;
         
         for(String taxon : taxons) {
@@ -95,12 +89,15 @@ public class FileContents {
         		if( taxon.length() > maxKeyLength ) {
         			maxKeyLength = taxon.length();
         		}
-        	    
-        		lookUpMap.put(taxon , "");
         		
         		boolean addNode = false;
         		
-        		for (String line : lines) {
+        		BufferedReader br = new BufferedReader( new FileReader(getLoadedFile()) );
+        		
+        		String line = "";
+        		String value = "";
+        		
+        		while( (line = br.readLine()) != null) {
         			
         			if( line.startsWith(">") && line.contains(taxon) ){
                     	
@@ -109,13 +106,15 @@ public class FileContents {
                 }else if( addNode ) {
         				
         				if( line.startsWith(">") || line.isEmpty() ) {
+        					br.close();
+        					lookUpMap.put( taxon , value );
         					break;
         				}
         				
-        				lookUpMap.put( taxon , lookUpMap.get(taxon) + line.replace("\n", "") );
-        				
+        				value += line.replace("\n", "");
         			}
             }
+        		//key has no value in file
         }
 
         return lookUpMap;
@@ -124,10 +123,10 @@ public class FileContents {
     public static JScrollPane generateSequenceView(Map<String, String> taxons) {
     	
     		StringBuilder text = new StringBuilder();
-
-	    taxons.forEach( (taxon, value) -> {
-	    		text.append(">" + taxon + "\n" + value + "\n");
-	    });
+    		
+    		for(Map.Entry<String, String> entry : taxons.entrySet()) {
+    			text.append(">" + entry.getKey() + "\n" + entry.getValue() + "\n");
+    		}
 	    
 	    JTextArea textArea = new JTextArea(32, 64);
 	    textArea.setEditable(false);
@@ -158,8 +157,11 @@ public class FileContents {
 				".sU {background-color: cyan;}" +
 			"</style>");
 
-		taxons.forEach( (taxon, value) -> {
+		for(Map.Entry<String, String> entry : taxons.entrySet()) {
 			
+			String taxon = entry.getKey();
+			String value = entry.getValue();
+
 			String taxonPadding = "";
 			
 			for( int i = 0, j = keyWidth - taxon.length(); i < j; i++ ) {
@@ -183,7 +185,7 @@ public class FileContents {
 	    		}
 	    		
 	    		valueHTML.append("<br>");
-	    });
+		}
 
 		JEditorPane taxonEP = new JEditorPane();
 		taxonEP.setEditable(false);
