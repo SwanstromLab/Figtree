@@ -132,8 +132,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             return;
         }
 
-
-
         if (toolMode == ToolMode.ROOTING) {
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
             if (node != null) {
@@ -180,6 +178,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
             }
             FileContents.cleanUp();
             FileContents.setSelectedTree(treePane.getTree());
+            FileContents.setSelectedNodes( treePane.getSelectedNodes() );
             FileContents.setSelectedNode(selectedNode);
             treePane.setCrosshairShown(isCrossHairShown);
         }
