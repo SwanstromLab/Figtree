@@ -137,9 +137,9 @@ public class FileContents {
 		StringBuilder taxonHTML = new StringBuilder();
 		StringBuilder valueHTML = new StringBuilder();
 		
-		String css = "span{white-space:nowrap;font-size:12px;font-family:monospace;}";
+		String css = "p{white-space:nowrap;font-size:12px;font-family:monospace;margin: 0;padding: 0;}";
 		
-		taxonHTML.append("<style>"+css+"</style>"+"<span>");
+		taxonHTML.append("<style>"+css+"</style>");
 		
 		css +=  ".sA{background-color:red;}" +
 				".sT{background-color:blue;}" +
@@ -151,13 +151,9 @@ public class FileContents {
 
 		for(Map.Entry<String, String> entry : taxons.entrySet()) {
 			
-			String taxon = entry.getKey();
 			char[] values = entry.getValue().toCharArray();
-
-			taxonHTML.append( taxon + "<br>" );
-			
+			StringBuilder sb = new StringBuilder();
 			String holdChars = "";
-			
 			int i = 0 , c = values.length - 1;
 			
 	    		for( char n : values ){
@@ -168,15 +164,16 @@ public class FileContents {
 	    				holdChars += s;
 	    			}else {
 	    				String ch = holdChars.isEmpty() ? s : holdChars;
-	    				valueHTML.append( "<span class=s"+s+">"+ch+"</span>" );
+	    				sb.append( "<span class=s"+s+">"+ch+"</span>" );
 		    			holdChars = "";
 	    			}
 	    			i++;
 	    		}
-	    		valueHTML.append("<br>");
+	    		taxonHTML.append("<p>"+entry.getKey() + "</p>");
+	    		valueHTML.append("<p>"+sb.toString() + "</p>");
 		}
 		
-		taxonHTML.append( "</span>" );
+		valueHTML.append("<br>"); //set scroll to start at left
 
 		JEditorPane taxonEP = new JEditorPane();
 		taxonEP.setEditable(false);
@@ -204,7 +201,7 @@ public class FileContents {
 	public static void displayResults(ArrayList<String> results) throws Exception {
 
     		Map<String, String> taxons = lookUp( results );
-    		
+
     		System.out.println("looked up");
 
         JTabbedPane tab = new JTabbedPane();
