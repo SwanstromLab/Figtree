@@ -24,7 +24,6 @@ import figtree.application.FigTreeApplication;
 public class FileContents {
 
 	private static File loadedFile = null;
-	private static int maxKeyLength = 0;
 	private static Node selectedNode;
 	private static Set<Node> selectedNodes;
 
@@ -82,13 +81,7 @@ public class FileContents {
     	
     		Map<String, String> lookUpMap = new HashMap<String, String>();
     		
-        maxKeyLength = 0;
-        
         for(String taxon : taxons) {
-        	
-        		if( taxon.length() > maxKeyLength ) {
-        			maxKeyLength = taxon.length();
-        		}
         		
         		boolean addNode = false;
         		
@@ -141,64 +134,62 @@ public class FileContents {
 
     public static JSplitPane generateAlignmentView(Map<String, String> taxons) throws Exception {
 		
-		StringBuilder html = new StringBuilder();
 		StringBuilder taxonHTML = new StringBuilder();
 		StringBuilder valueHTML = new StringBuilder();
 		
-		int keyWidth = maxKeyLength + 2;
+		String css = "span{white-space:nowrap;font-size:12px;font-family:monospace;}";
 		
-		html.append(
-			"<style>" + 
-				"span { white-space:nowrap; font-size: 12px; font-family: monospace; }" +
-				".sA {background-color: red; }" +
-				".sT {background-color: blue;}" +
-				".sC {background-color: yellow;}" +
-				".sG {background-color: green;}" +
-				".sU {background-color: cyan;}" +
-			"</style>");
+		taxonHTML.append("<style>"+css+"</style>"+"<span>");
+		
+		css +=  ".sA{background-color:red;}" +
+				".sT{background-color:blue;}" +
+				".sC{background-color:yellow;}" +
+				".sG{background-color:green;}" +
+				".sU{background-color:cyan;}";
+		
+		valueHTML.append("<style>"+css+"</style>");
 
 		for(Map.Entry<String, String> entry : taxons.entrySet()) {
 			
 			String taxon = entry.getKey();
-			String value = entry.getValue();
+			char[] values = entry.getValue().toCharArray();
 
-			String taxonPadding = "";
+			taxonHTML.append( taxon + "<br>" );
 			
-			for( int i = 0, j = keyWidth - taxon.length(); i < j; i++ ) {
-				taxonPadding += "&nbsp;";
-			}
-
-			taxonHTML.append( "<span class='taxon'>" + taxon + taxonPadding + "</span><br>" );
+			String holdChars = "";
 			
-			String chars = "";
-	    		
-	    		for( char nucleotide : value.toCharArray() ){
+			int i = 0 , c = values.length - 1;
+			
+	    		for( char n : values ){
 	    			
-	    			String n = String.valueOf(nucleotide);
+	    			String s = String.valueOf( n );
 	    			
-	    			if( chars.contains(n) ) {
-	    				chars += n;
+	    			if( i != c && s == String.valueOf( values[i+1] ) ) {
+	    				holdChars += s;
 	    			}else {
-	    				valueHTML.append( "<span class='s"+n.substring(0,1)+"'>"+n+"</span>" );
-	    				chars = "";
+	    				String ch = holdChars.isEmpty() ? s : holdChars;
+	    				valueHTML.append( "<span class=s"+s+">"+ch+"</span>" );
+		    			holdChars = "";
 	    			}
+	    			i++;
 	    		}
-	    		
 	    		valueHTML.append("<br>");
 		}
+		
+		taxonHTML.append( "</span>" );
 
 		JEditorPane taxonEP = new JEditorPane();
 		taxonEP.setEditable(false);
 		taxonEP.setContentType("text/html");
-		taxonEP.setText(html.toString() + taxonHTML.toString());
+		taxonEP.setText(taxonHTML.toString());
 		
 		JEditorPane valueEP = new JEditorPane();
 		valueEP.setEditable(false);
 		valueEP.setContentType("text/html");
-		valueEP.setText(html.toString() + valueHTML.toString());
+		valueEP.setText(valueHTML.toString());
 		
 		JScrollPane taxonPane = new JScrollPane(taxonEP , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		JScrollPane valuePane = new JScrollPane(valueEP , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane valuePane = new JScrollPane(valueEP , JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
 		taxonPane.getVerticalScrollBar().setModel(valuePane.getVerticalScrollBar().getModel());
 		valuePane.getVerticalScrollBar().setModel(taxonPane.getVerticalScrollBar().getModel());
@@ -211,13 +202,11 @@ public class FileContents {
     }
 
 	public static void displayResults(ArrayList<String> results) throws Exception {
-		
-		System.out.println("display");
 
     		Map<String, String> taxons = lookUp( results );
     		
     		System.out.println("looked up");
-    	
+
         JTabbedPane tab = new JTabbedPane();
         tab.addTab("Sequence View", generateSequenceView(taxons) );
         tab.addTab("Alignment View", generateAlignmentView(taxons) );
@@ -233,7 +222,6 @@ public class FileContents {
         frame.setVisible(true);
         
         System.out.println("framed");
-        
     }
 
 	public static final void initiateLookup(RootedTree tree, Node node) {
