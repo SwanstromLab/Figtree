@@ -223,8 +223,7 @@ public class FileContents {
 
 	public static final void initiateLookup(RootedTree tree, Node node) {
 		
-		if( loadedFile == null ) {
-			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+		if( checkEmptyVars(node == null) ) {
 			return;
 		}
 	
@@ -264,36 +263,51 @@ public class FileContents {
 
     public static final void initiateHighlightedLookup(RootedTree tree, Set<Node> nodes) {
     	
-			if( loadedFile == null ) {
-				JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
-				return;
-			}
+    		if( checkEmptyVars(nodes.isEmpty()) ) {
+    			return;
+    		}
 
-			ArrayList<String> tipTaxons = new ArrayList<String>();
-			Integer count = 0;
-			Set<Node> tips = new HashSet<Node>();
+		ArrayList<String> tipTaxons = new ArrayList<String>();
+		Integer count = 0;
+		Set<Node> tips = new HashSet<Node>();
 
-			for(Node node : nodes) {
+		for(Node node : nodes) {
+			
 			tips = RootedTreeUtils.getDescendantTips(tree, node);
+	
+			if(tips.isEmpty()) {
+				tips.add(node);
+			}
+			for(Node tip : tips) {
+				System.out.println(tree.getTaxon(tip).toString());
+				tipTaxons.add(tree.getTaxon(tip).toString());
+				count++;
+			}
+		}
 
-					if(tips.isEmpty()) {
-							tips.add(node);
-					}
-					for(Node tip : tips) {
-							System.out.println(tree.getTaxon(tip).toString());
-							tipTaxons.add(tree.getTaxon(tip).toString());
-							count++;
-					}
-		  }
-
-        try {
-					displayResults(tipTaxons);
-				} catch (Exception e) {
-					System.out.println("Could not display results for selected multiple taxons");
-					e.printStackTrace();
-				}
+		try {
+			displayResults(tipTaxons);
+		} catch (Exception e) {
+			System.out.println("Could not display results for selected multiple taxons");
+			e.printStackTrace();
+		}
     }
 
+    private static boolean checkEmptyVars(boolean emptySet) {
+		
+		if( loadedFile == null ) {
+			JOptionPane.showMessageDialog(new JFrame(), "No .fa file loaded.");
+			return true;
+		}
+		
+		if( emptySet ) {
+    			JOptionPane.showMessageDialog(new JFrame(), "No nodes selected.");
+    			return true;
+		}
+		
+		return false;
+	}
+    
     public static void cleanUp() {
 		setSelectedNode(null);
 		setSelectedNodes(null);
