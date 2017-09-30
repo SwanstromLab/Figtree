@@ -230,8 +230,7 @@ public class FileContents {
     		Set<Node> tips = RootedTreeUtils.getDescendantTips(tree, node);
 
 		if (tips.isEmpty()) {
-			System.out.println("Taxons");
-				String taxon = new String();
+			String taxon = new String();
 			taxon = tree.getTaxon(node).toString();
 			ArrayList<String> tipTaxons = new ArrayList<String>();
 			tipTaxons.add(taxon);
@@ -243,10 +242,7 @@ public class FileContents {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("tips implementation");
 			ArrayList<String> tipTaxons = new ArrayList<String>();
-
-			System.out.println(tips.size());
 
 			for(Node tip : tips) {
 				tipTaxons.add(tree.getTaxon(tip).toString());
@@ -279,7 +275,6 @@ public class FileContents {
 				tips.add(node);
 			}
 			for(Node tip : tips) {
-				System.out.println(tree.getTaxon(tip).toString());
 				tipTaxons.add(tree.getTaxon(tip).toString());
 				count++;
 			}
