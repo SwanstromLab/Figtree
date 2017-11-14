@@ -90,6 +90,8 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 
     private SearchPanel filterPanel;
     private JPopupMenu filterPopup;
+    
+    public static boolean fixHighResScale = false;
 
     public FigTreeFrame(String title) {
         super();
@@ -114,7 +116,13 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
 
     public void initializeComponents() {
 
-        setSize(new java.awt.Dimension(1024, 768));
+        setSize(new java.awt.Dimension(1200, 768));
+        
+        float dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        
+        if( dpi > 200 || (int)dpi == 113 ) {
+        		fixHighResScale = true;
+        }
 
         Toolbar toolBar = new Toolbar();
         toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.darkGray));
@@ -308,6 +316,18 @@ public class FigTreeFrame extends DocumentFrame implements FigTreeFileMenuHandle
         lookupToolButton.setFocusable(false);
         toolBar.addComponent(lookupToolButton);
         lookupToolButton.setEnabled(true);
+        
+        JCheckBoxMenuItem scaleHighResCheckbox = new JCheckBoxMenuItem("Fix Scale", fixHighResScale);
+        scaleHighResCheckbox.setVisible(true);
+        scaleHighResCheckbox.setEnabled(true);
+
+        scaleHighResCheckbox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+            		fixHighResScale = e.getStateChange() == 1;
+            }
+        });
+        
+        toolBar.addComponent(scaleHighResCheckbox);
         
         toolBar.addFlexibleSpace();
 

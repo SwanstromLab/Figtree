@@ -29,6 +29,8 @@ import figtree.treeviewer.decorators.*;
 import figtree.treeviewer.painters.*;
 import figtree.treeviewer.treelayouts.*;
 
+import figtree.application.FigTreeFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
@@ -1164,6 +1166,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     }
 
     public Node getNodeAt(Graphics2D g2, Point point) {
+    	
+    		if( FigTreeFrame.fixHighResScale ) {
+    			point.setLocation( point.x*2, point.y*2 );
+    		}
+    	
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
         rect.translate(-insets.left, -insets.top);
 
@@ -1192,6 +1199,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     }
 
     public Set<Node> getNodesAt(Graphics2D g2, Rectangle rect) {
+    		
+    		if( FigTreeFrame.fixHighResScale ) {
+    			rect.setLocation((int)rect.getX()*2, (int)rect.getY()*2);
+    			rect.setSize((int)rect.getWidth()*2, (int)rect.getHeight()*2);
+    		}
 
         Set<Node> nodes = new HashSet<Node>();
         for (Node node : tree.getExternalNodes()) {
